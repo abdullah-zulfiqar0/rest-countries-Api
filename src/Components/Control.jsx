@@ -1,30 +1,37 @@
-import React from "react";
+import React from 'react';
 
-const Control = ({setSearchQuery,selectedRegion,setselectedRegion}) => {
+const Control = ({ searchQuery, setSearchQuery, selectedRegion, setselectedRegion, darkMode }) => {
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-4 md:px-12 py-6">
+    <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-6 px-4 md:px-12 py-6">
       
-     
-      <div className="transition-transform duration-300 hover:scale-105 relative w-full md:w-[480px]">
-       
-        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
-          🔍
-        </span>
-
+      {/* Search Input */}
+      <div className={`flex items-center gap-4 px-6 py-4 rounded-lg shadow-md w-full md:w-1/3 transition-colors duration-300 ${
+        darkMode ? 'bg-dark-element text-dark-text' : 'bg-white text-gray-900'
+      }`}>
+        <span className="text-lg">🔍</span>
         <input
-          onChange={(e)=>setSearchQuery(e.target.value)}
           type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search for a country..."
-          className="w-full bg-dark-element text-dark-text py-4 pl-14 pr-4 rounded-md shadow-md outline-none placeholder:text-gray-400"
+          className={`w-full bg-transparent border-none outline-none focus:ring-0 text-sm md:text-base ${
+            darkMode ? 'placeholder-gray-400 text-dark-text' : 'placeholder-gray-500 text-gray-900'
+          }`}
         />
       </div>
 
-  
-      <div className=" transition-transform duration-300 hover:scale-105 w-52">
-        <select  onChange={(e) => setselectedRegion(e.target.value)} className="w-full bg-dark-element text-dark-text py-4 px-6 rounded-md shadow-md outline-none cursor-pointer">
-          <option value="" disabled selected hidden>Filter by Region</option>
+      {/* Region Dropdown */}
+      <div className="w-48">
+        <select
+          value={selectedRegion}
+          onChange={(e) => setselectedRegion(e.target.value)}
+          className={`w-full px-6 py-4 rounded-lg shadow-md border-none outline-none focus:ring-0 cursor-pointer text-sm md:text-base transition-colors duration-300 ${
+            darkMode ? 'bg-dark-element text-dark-text' : 'bg-white text-gray-900'
+          }`}
+        >
+          <option value="">Filter by Region</option>
           <option value="Africa">Africa</option>
-          <option value="America">America</option>
+          <option value="Americas">Americas</option>
           <option value="Asia">Asia</option>
           <option value="Europe">Europe</option>
           <option value="Oceania">Oceania</option>
