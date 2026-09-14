@@ -23,7 +23,7 @@ The application allows users to:
 [Live Demo](https://rest-countries-api-seven-woad.vercel.app/) <!-- Add your Vercel or Netlify link here -->
 
 ### Repository
-[GitHub Repository](https://github.com/abdullah-zulfiqar0) <!-- Update with your exact repo link -->
+[GitHub Repository](https://github.com/abdullah-zulfiqar0/rest-countries-Api) <!-- Update with your exact repo link -->
 
 ---
 
