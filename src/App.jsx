@@ -3,7 +3,7 @@ import NavBar from "./Components/NavBar";
 import "./index.css";
 import axios from "axios";
 import DetailPage from "./Components/DetailPage";
-import Home from "./pages/Home";
+import Home from "./Pages/Home";
 import NotFound from "./Pages/NotFound";
 import { Routes, Route } from 'react-router-dom';
 
