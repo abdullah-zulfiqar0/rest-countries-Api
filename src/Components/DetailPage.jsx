@@ -1,128 +1,112 @@
-import React from "react";
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 
-const DetailPage = ({
-  countries,
-  selectedCountry,
-  setselectedCountry,
-  onBack,
-  darkMode,
-}) => {
+const DetailPage = ({ countries, darkMode }) => {
+  // 1. URL se country code extract karo
+  const { code } = useParams();
+
+  // 2. Current country find karo
+  const selectedCountry = countries.find(
+    (c) => (c?.cca3 || c?.alpha3Code || c?.name?.common) === code
+  )
+
+  if (!selectedCountry) {
+    return <p className="py-10 text-center">Country details not found.</p>;
+  }
+
+  // --- EASY DATA EXTRACTIONS ---
+
+  // Native Name
+  const nativeName = selectedCountry?.name?.nativeName 
+    ? Object.values(selectedCountry.name.nativeName)[0]?.common 
+    : selectedCountry?.nativeName || selectedCountry?.name?.common || "N/A";
+
+  // Capital
+  const capital = Array.isArray(selectedCountry?.capital)
+    ? selectedCountry.capital.join(", ")
+    : selectedCountry?.capital || "N/A";
+
+  // Currencies
+  const currencies = selectedCountry?.currencies
+    ? Object.values(selectedCountry.currencies).map((c) => c.name || c).join(", ")
+    : "N/A";
+
+  // Languages
+  const languages = selectedCountry?.languages
+    ? Object.values(selectedCountry.languages).join(", ")
+    : "N/A";
+
+  // BORDER COUNTRIES EXTRACTION LOGIC
+  // Code ko full country name mein convert karta hai
+  const getBorderName = (borderCode) => {
+    const found = countries.find(
+      (c) => (c?.cca3 || c?.alpha3Code) === borderCode
+    );
+    return found ? (found?.name?.common || found?.name) : borderCode;
+  };
+
   return (
-    <div
-      className={`px-4 md:px-12 py-6 min-h-[calc(100vh-80px)] transition-colors duration-300 ${
-        darkMode ? "text-dark-text" : "text-gray-900"
-      }`}
-    >
-      <button
-        onClick={onBack}
-        className={`flex items-center gap-2 shadow-md transition-transform duration-300 hover:scale-105 cursor-pointer rounded-lg py-3 px-8 mb-10 ${
-          darkMode ? "bg-dark-element text-dark-text" : "bg-white text-gray-900"
+    <div className="px-6 py-8 mx-auto max-w-7xl">
+      {/* Back Button */}
+      <Link
+        to="/"
+        className={`inline-block px-8 py-2 rounded-md shadow-md mb-8 transition-opacity hover:opacity-80 ${
+          darkMode ? 'bg-dark-element text-dark-text' : 'bg-white text-gray-900'
         }`}
       >
-        <span>←</span> Back
-      </button>
+        ← Back
+      </Link>
 
-      <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
-        {/* Left Container: Flag Image */}
-        <div className="w-full md:w-1/2">
-          <img
-            className="w-full h-auto max-h-[380px] object-cover rounded-lg shadow-md"
-            src={
-              selectedCountry?.flags?.png ||
-              selectedCountry?.flags?.svg ||
-              selectedCountry?.flag
-            }
-            alt={selectedCountry?.name?.common || selectedCountry?.name}
-          />
-        </div>
+      <div className="grid items-center grid-cols-1 gap-12 lg:grid-cols-2">
+        {/* Flag */}
+        <img
+          src={selectedCountry?.flags?.png || selectedCountry?.flags?.svg || selectedCountry?.flag}
+          alt={selectedCountry?.name?.common || selectedCountry?.name}
+          className="object-contain w-full rounded-md shadow-lg max-h-96"
+        />
 
-        <div className="w-full md:w-1/2">
-          <h1 className="text-2xl md:text-3xl font-bold mb-6">
+        {/* Info Section */}
+        <div>
+          <h2 className="mb-6 text-3xl font-extrabold">
             {selectedCountry?.name?.common || selectedCountry?.name}
-          </h1>
-
-          <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
-            <div className="space-y-2 text-sm md:text-base">
-              <p>
-                <span className="font-semibold">Native Name: </span>
-                {selectedCountry?.nativeName || "N/A"}
-              </p>
-              <p>
-                <span className="font-semibold">Population: </span>
-                {selectedCountry?.population?.toLocaleString()}
-              </p>
-              <p>
-                <span className="font-semibold">Region: </span>
-                {selectedCountry?.region}
-              </p>
-              <p>
-                <span className="font-semibold">Sub Region: </span>
-                {selectedCountry?.subregion || "N/A"}
-              </p>
+          </h2>
+          
+          <div className="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2">
+            <div className="space-y-2">
+              <p><strong>Native Name:</strong> {nativeName}</p>
+              <p><strong>Population:</strong> {selectedCountry?.population?.toLocaleString()}</p>
+              <p><strong>Region:</strong> {selectedCountry?.region}</p>
+              <p><strong>Sub Region:</strong> {selectedCountry?.subregion || 'N/A'}</p>
+              <p><strong>Capital:</strong> {capital}</p>
             </div>
 
-            {/* Right Column */}
-            <div className="space-y-2 text-sm md:text-base">
-              <p>
-                <span className="font-semibold">Capital: </span>
-                {selectedCountry?.capital || "N/A"}
-              </p>
-              <p>
-                <span className="font-semibold">Top Level Domain: </span>
-                {selectedCountry?.topLevelDomain || "N/A"}
-              </p>
-              <p>
-                <span className="font-semibold">Currencies: </span>
-                {selectedCountry?.currencies
-                  ? selectedCountry.currencies
-                      .map((item) => item.name)
-                      .join(", ")
-                  : "N/A"}
-              </p>
-              <p>
-                <span className="font-semibold">Languages: </span>
-                {selectedCountry?.languages
-                  ? selectedCountry.languages
-                      .map((item) => item.name)
-                      .join(", ")
-                  : "N/A"}
-              </p>
+            <div className="space-y-2">
+              <p><strong>Top Level Domain:</strong> {selectedCountry?.tld?.[0] || selectedCountry?.topLevelDomain?.[0] || 'N/A'}</p>
+              <p><strong>Currencies:</strong> {currencies}</p>
+              <p><strong>Languages:</strong> {languages}</p>
             </div>
           </div>
 
-          {/* Border Countries */}
-          <div className="mt-10 flex flex-col md:flex-row gap-4 items-start md:items-center">
-            <div className="text-sm md:text-base font-bold">
-              <span>Border Countries: </span>
-            </div>
-
-            <div className="flex flex-wrap gap-2 text-sm md:text-base">
-              {selectedCountry?.borders?.length > 0 ? (
-                selectedCountry.borders.map((item) => (
-                  <button
-                    onClick={() => {
-                      const targetCountry = countries.find(
-                        (c) => c.alpha3Code === item || c.cca3 === item,
-                      );
-                      if (targetCountry) {
-                        setselectedCountry(targetCountry);
-                      }
-                    }}
-                    key={item}
-                    className={`px-4 py-1 shadow-md rounded-md text-xs md:text-sm cursor-pointer transition-transform duration-200 hover:scale-105 ${
-                      darkMode
-                        ? "bg-dark-element text-dark-text"
-                        : "bg-white text-gray-900"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))
-              ) : (
-                <span>N/A</span>
-              )}
-            </div>
+          {/* BORDER COUNTRIES SECTION */}
+          <div className="flex flex-wrap items-center gap-2">
+            <strong className="mr-2">Border Countries:</strong>
+            {selectedCountry?.borders && selectedCountry.borders.length > 0 ? (
+              selectedCountry.borders.map((borderCode) => (
+                <Link
+                  key={borderCode}
+                  to={`/country/${borderCode}`}
+                  className={`px-4 py-1 text-sm rounded shadow transition-all hover:scale-105 ${
+                    darkMode ? 'bg-dark-element text-dark-text' : 'bg-white text-gray-900'
+                  }`}
+                >
+                  {getBorderName(borderCode)}
+                </Link>
+              ))
+            ) : (
+              <span>None</span>
+            )}
           </div>
+
         </div>
       </div>
     </div>

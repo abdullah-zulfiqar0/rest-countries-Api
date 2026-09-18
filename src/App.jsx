@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "./Components/NavBar";
 import "./index.css";
-import Control from "./Components/Control";
 import axios from "axios";
-import CardComponent from "./Components/CardComponent";
 import DetailPage from "./Components/DetailPage";
+import Home from "./pages/Home";
+import NotFound from "./Pages/NotFound";
+import { Routes, Route } from 'react-router-dom';
 
 const App = () => {
   const [countries, setcountries] = useState([]);
-  const [searchQuery, setsearchQuery] = useState("");
-  const [selectedRegion, setselectedRegion] = useState("");
   const [loading, setloading] = useState(true);
   const [error, seterror] = useState(false);
-  const [selectedCountry, setselectedCountry] = useState(null);
+
+  // Purani selectedCountry state (ab URL param handle karega)
+  // const [selectedCountry, setselectedCountry] = useState(null);
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
@@ -27,15 +28,6 @@ const App = () => {
       localStorage.setItem("theme", "light");
     }
   }, [darkMode]);
-
-  const filterCountries = countries.filter((fil) => {
-    const name = (fil?.name?.common || fil?.name || "").toLowerCase();
-    const region = fil?.region || "";
-    const nameSearch = name.includes(searchQuery.toLowerCase());
-    const matchesRegion = selectedRegion ? region === selectedRegion : true;
-
-    return nameSearch && matchesRegion;
-  });
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -56,20 +48,39 @@ const App = () => {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${darkMode ? "bg-dark-bg text-dark-text" : "bg-gray-100 text-gray-900"}`}
+      className={`min-h-screen transition-colors duration-300 ${
+        darkMode ? "bg-dark-bg text-dark-text" : "bg-gray-100 text-gray-900"
+      }`}
     >
       <NavBar darkMode={darkMode} setDarkMode={setDarkMode} />
 
-      {loading && <p className="text-center py-10">Loading countries...</p>}
+      {loading && <p className="py-10 text-center">Loading countries...</p>}
       {error && (
-        <p className="text-red-500 text-center py-10">
+        <p className="py-10 text-center text-red-500">
           Failed to load countries data.
         </p>
       )}
 
-      {!loading &&
-        !error &&
-        (selectedCountry ? (
+      {/* REACT ROUTER ROUTING */}
+      {!loading && !error && (
+        <Routes>
+          <Route
+            path="/"
+            element={<Home countries={countries} darkMode={darkMode} />}
+          />
+          <Route
+            path="/country/:code"
+            element={<DetailPage countries={countries} darkMode={darkMode} />}
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      )}
+
+      {/* =========================================================
+          PURANA CONDITIONAL RENDERING CODE (COMMENTED OUT)
+         =========================================================
+      {!loading && !error && (
+        selectedCountry ? (
           <DetailPage
             countries={countries}
             selectedCountry={selectedCountry}
@@ -86,7 +97,7 @@ const App = () => {
               setselectedRegion={setselectedRegion}
               darkMode={darkMode}
             />
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 px-4 md:px-12 py-8">
+            <div className="grid grid-cols-1 gap-12 px-4 py-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:px-12">
               {filterCountries.length > 0 ? (
                 filterCountries.map((coun) => (
                   <CardComponent
@@ -97,13 +108,15 @@ const App = () => {
                   />
                 ))
               ) : (
-                <p className="col-span-full text-center py-10">
+                <p className="py-10 text-center col-span-full">
                   No countries found.
                 </p>
               )}
             </div>
           </>
-        ))}
+        )
+      )}
+      ========================================================= */}
     </div>
   );
 };
