@@ -30,11 +30,16 @@ const DetailPage = ({ countries, darkMode }) => {
   const currencies = selectedCountry?.currencies
     ? Object.values(selectedCountry.currencies).map((c) => c.name || c).join(", ")
     : "N/A";
-
-  // Languages
-  const languages = selectedCountry?.languages
-    ? Object.values(selectedCountry.languages).join(", ")
-    : "N/A";
+// Languages
+const languages = selectedCountry?.languages
+  ? Array.isArray(selectedCountry.languages)
+    ? selectedCountry.languages.map((l) => l.name || l).join(", ")
+    : typeof selectedCountry.languages === "object"
+    ? Object.values(selectedCountry.languages)
+        .map((l) => (typeof l === "object" ? l.name : l))
+        .join(", ")
+    : selectedCountry.languages
+  : "N/A";
 
   // BORDER COUNTRIES EXTRACTION LOGIC
   // Code ko full country name mein convert karta hai
